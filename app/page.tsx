@@ -4,23 +4,19 @@ import { useState } from "react"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 import { FilterBar } from "@/components/dashboard/filter-bar"
-import { TabResumen } from "@/components/dashboard/tabs/tab-resumen"
-import { TabVolumen } from "@/components/dashboard/tabs/tab-volumen"
-import { TabCobertura } from "@/components/dashboard/tabs/tab-cobertura"
+import { TabParticipacion } from "@/components/dashboard/tabs/tab-participacion"
 import { TabCalidad } from "@/components/dashboard/tabs/tab-calidad"
 import { cn } from "@/lib/utils"
 
 const TABS = [
-  { id: "resumen", label: "Resumen" },
-  { id: "volumen", label: "Volumen" },
-  { id: "cobertura", label: "Cobertura" },
-  { id: "calidad", label: "Calidad" },
+  { id: "participacion", label: "Participaci\u00f3n" },
+  { id: "calidad", label: "Calidad y Resultado" },
 ] as const
 
 type TabId = (typeof TABS)[number]["id"]
 
 export default function PeopleAnalyticsDashboard() {
-  const [activeTab, setActiveTab] = useState<TabId>("resumen")
+  const [activeTab, setActiveTab] = useState<TabId>("participacion")
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -60,9 +56,7 @@ export default function PeopleAnalyticsDashboard() {
 
           {/* Dashboard content */}
           <div className="px-4 md:px-6 py-5">
-            {activeTab === "resumen" && <TabResumen />}
-            {activeTab === "volumen" && <TabVolumen />}
-            {activeTab === "cobertura" && <TabCobertura />}
+            {activeTab === "participacion" && <TabParticipacion />}
             {activeTab === "calidad" && <TabCalidad />}
           </div>
         </main>
