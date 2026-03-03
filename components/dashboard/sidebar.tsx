@@ -25,7 +25,7 @@ const NAV_ITEMS = [
   { icon: Calendar, label: "Tiempo" },
   { icon: MessageSquare, label: "Comunicación" },
   { icon: Rocket, label: "Talento" },
-  { icon: AlignJustify, label: "Nómina" },
+  { icon: AlignJustify, label: "N\u00f3mina" },
   { icon: PieChart, label: "Informes" },
 ]
 
