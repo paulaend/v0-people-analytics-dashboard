@@ -1,10 +1,9 @@
 "use client"
 
+import { Users, Clock, TrendingUp, BookOpen, Star } from "lucide-react"
 import {
-  Users, BookOpen, Clock, TrendingUp, DollarSign, Star,
-} from "lucide-react"
-import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  LineChart, Line, PieChart, Pie, Cell,
+  BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts"
 import { KPICard } from "@/components/dashboard/kpi-card"
@@ -15,25 +14,70 @@ const GREEN = "var(--chart-green)"
 const BLUE_LIGHT = "#a8c4e8"
 const GREEN_LIGHT = "#9fd4c2"
 
-const monthlyEmployees = [
-  { mes: "Ene", formados: 28 }, { mes: "Feb", formados: 35 }, { mes: "Mar", formados: 42 },
-  { mes: "Abr", formados: 31 }, { mes: "May", formados: 48 }, { mes: "Jun", formados: 55 },
-  { mes: "Jul", formados: 38 }, { mes: "Ago", formados: 22 }, { mes: "Sep", formados: 46 },
-  { mes: "Oct", formados: 52 }, { mes: "Nov", formados: 49 }, { mes: "Dic", formados: 33 },
+// ─── KPI data ────────────────────────────────────────────────────────────────
+const kpis = [
+  {
+    title: "Empleados formados",
+    value: "479",
+    subtitle: "Participantes únicos finalizados",
+    icon: Users,
+    trend: { value: "8,3%", positive: true },
+  },
+  {
+    title: "% plantilla formada",
+    value: "72,6%",
+    subtitle: "Sobre empleados activos",
+    icon: TrendingUp,
+    trend: { value: "4,1 pp", positive: true },
+  },
+  {
+    title: "Horas totales recibidas",
+    value: "7.390 h",
+    subtitle: "Participantes finalizados",
+    icon: Clock,
+    trend: { value: "12,4%", positive: true },
+  },
+  {
+    title: "Horas medias/formado",
+    value: "15,4 h",
+    subtitle: "Por empleado formado",
+    icon: BookOpen,
+  },
+  {
+    title: "Satisfacción media",
+    value: "4,2 / 5",
+    subtitle: "Media global de cuestionarios",
+    icon: Star,
+    trend: { value: "+0,3", positive: true },
+  },
 ]
 
-const monthlyHours = [
-  { mes: "Ene", horas: 420 }, { mes: "Feb", horas: 560 }, { mes: "Mar", horas: 640 },
-  { mes: "Abr", horas: 480 }, { mes: "May", horas: 720 }, { mes: "Jun", horas: 880 },
-  { mes: "Jul", horas: 580 }, { mes: "Ago", horas: 320 }, { mes: "Sep", horas: 700 },
-  { mes: "Oct", horas: 820 }, { mes: "Nov", horas: 760 }, { mes: "Dic", horas: 510 },
+// ─── Chart data ───────────────────────────────────────────────────────────────
+const monthlyPersonas = [
+  { mes: "Ene", actual: 28, anterior: 24 }, { mes: "Feb", actual: 35, anterior: 29 },
+  { mes: "Mar", actual: 42, anterior: 36 }, { mes: "Abr", actual: 31, anterior: 27 },
+  { mes: "May", actual: 48, anterior: 41 }, { mes: "Jun", actual: 55, anterior: 47 },
+  { mes: "Jul", actual: 38, anterior: 33 }, { mes: "Ago", actual: 22, anterior: 20 },
+  { mes: "Sep", actual: 46, anterior: 40 }, { mes: "Oct", actual: 52, anterior: 45 },
+  { mes: "Nov", actual: 49, anterior: 43 }, { mes: "Dic", actual: 33, anterior: 29 },
 ]
 
-const monthlyCost = [
-  { mes: "Ene", coste: 8200 }, { mes: "Feb", coste: 11400 }, { mes: "Mar", coste: 13800 },
-  { mes: "Abr", coste: 9600 }, { mes: "May", coste: 15200 }, { mes: "Jun", coste: 18400 },
-  { mes: "Jul", coste: 12100 }, { mes: "Ago", coste: 6800 }, { mes: "Sep", coste: 14600 },
-  { mes: "Oct", coste: 17200 }, { mes: "Nov", coste: 16100 }, { mes: "Dic", coste: 10400 },
+const monthlyHoras = [
+  { mes: "Ene", actual: 420, anterior: 370 }, { mes: "Feb", actual: 560, anterior: 490 },
+  { mes: "Mar", actual: 640, anterior: 568 }, { mes: "Abr", actual: 480, anterior: 422 },
+  { mes: "May", actual: 720, anterior: 634 }, { mes: "Jun", actual: 880, anterior: 772 },
+  { mes: "Jul", actual: 580, anterior: 514 }, { mes: "Ago", actual: 320, anterior: 292 },
+  { mes: "Sep", actual: 700, anterior: 614 }, { mes: "Oct", actual: 820, anterior: 726 },
+  { mes: "Nov", actual: 760, anterior: 672 }, { mes: "Dic", actual: 510, anterior: 452 },
+]
+
+const monthlyCoste = [
+  { mes: "Ene", actual: 8200, anterior: 7400 }, { mes: "Feb", actual: 11400, anterior: 10200 },
+  { mes: "Mar", actual: 13800, anterior: 12400 }, { mes: "Abr", actual: 9600, anterior: 8700 },
+  { mes: "May", actual: 15200, anterior: 13600 }, { mes: "Jun", actual: 18400, anterior: 16400 },
+  { mes: "Jul", actual: 12100, anterior: 11000 }, { mes: "Ago", actual: 6800, anterior: 6200 },
+  { mes: "Sep", actual: 14600, anterior: 13100 }, { mes: "Oct", actual: 17200, anterior: 15600 },
+  { mes: "Nov", actual: 16100, anterior: 14600 }, { mes: "Dic", actual: 10400, anterior: 9400 },
 ]
 
 const categoryHours = [
@@ -50,17 +94,19 @@ const modalityHours = [
   { modalidad: "Blended", porcentaje: 17 },
 ]
 
-const kpis = [
-  { title: "Total empleados formados", value: "479", subtitle: "Acumulado año", icon: Users, trend: { value: "8,3%", positive: true } },
-  { title: "% empleados formados", value: "72,6%", subtitle: "Sobre plantilla activa", icon: TrendingUp, trend: { value: "4,1 pp", positive: true } },
-  { title: "Total horas de formación", value: "7.390", subtitle: "Horas recibidas", icon: Clock, trend: { value: "12,4%", positive: true } },
-  { title: "Media horas/formado", value: "15,4 h", subtitle: "Por empleado formado", icon: BookOpen },
-  { title: "Coste total formación", value: "154.800 €", subtitle: "Inversión acumulada", icon: DollarSign, trend: { value: "9,7%", positive: false } },
-  { title: "Satisfacción media", value: "4,2 / 5", subtitle: "Puntuación media global", icon: Star, trend: { value: "+0,3", positive: true } },
+const byOrgLevel = [
+  { nivel: "Nivel bajo", personas: 128 },
+  { nivel: "Nivel medio", personas: 194 },
+  { nivel: "Nivel alto", personas: 112 },
+  { nivel: "Dirección", personas: 45 },
 ]
 
-function ChartTooltipStyle({ active, payload, label, formatter }: {
-  active?: boolean; payload?: Array<{ value: number; name: string; color?: string }>; label?: string; formatter?: (v: number) => string
+// ─── Tooltip ──────────────────────────────────────────────────────────────────
+function Tip({ active, payload, label, formatter }: {
+  active?: boolean
+  payload?: Array<{ value: number; name: string; color?: string }>
+  label?: string
+  formatter?: (v: number) => string
 }) {
   if (!active || !payload?.length) return null
   return (
@@ -78,55 +124,62 @@ function ChartTooltipStyle({ active, payload, label, formatter }: {
 export function TabResumen() {
   return (
     <div className="flex flex-col gap-4">
-      {/* KPI Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* KPI Row – 5 tarjetas */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {kpis.map((kpi) => (
           <KPICard key={kpi.title} {...kpi} />
         ))}
       </div>
 
-      {/* Charts row 1 */}
+      {/* Línea 1 – Tendencias interanuales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ChartCard title="Empleados formados mensual">
+        <ChartCard title="Tendencia mensual de personas formadas">
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={monthlyEmployees} barSize={14}>
+            <LineChart data={monthlyPersonas}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <Tooltip content={<ChartTooltipStyle formatter={(v) => `${v} emp.`} />} />
-              <Bar dataKey="formados" name="Formados" fill={BLUE} radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard title="Horas de formación mensual">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={monthlyHours}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <Tooltip content={<ChartTooltipStyle formatter={(v) => `${v} h`} />} />
-              <Line type="monotone" dataKey="horas" name="Horas" stroke={GREEN} strokeWidth={2} dot={false} />
+              <Tooltip content={<Tip formatter={(v) => `${v} emp.`} />} />
+              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
+              <Line type="monotone" dataKey="actual" name="Año actual" stroke={BLUE} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="anterior" name="Año anterior" stroke={GREEN} strokeWidth={2} dot={false} strokeDasharray="4 2" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Coste de formación mensual">
+        <ChartCard title="Tendencia mensual de horas recibidas">
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={monthlyCost} barSize={14}>
+            <LineChart data={monthlyHoras}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <Tooltip content={<Tip formatter={(v) => `${v} h`} />} />
+              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
+              <Line type="monotone" dataKey="actual" name="Año actual" stroke={BLUE} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="anterior" name="Año anterior" stroke={GREEN} strokeWidth={2} dot={false} strokeDasharray="4 2" />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Tendencia mensual de coste">
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={monthlyCoste}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}K`} />
-              <Tooltip content={<ChartTooltipStyle formatter={(v) => `${v.toLocaleString("es-ES")} €`} />} />
-              <Bar dataKey="coste" name="Coste" fill={BLUE_LIGHT} radius={[3, 3, 0, 0]} />
-            </BarChart>
+              <Tooltip content={<Tip formatter={(v) => `${v.toLocaleString("es-ES")} €`} />} />
+              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
+              <Line type="monotone" dataKey="actual" name="Año actual" stroke={BLUE_LIGHT} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="anterior" name="Año anterior" stroke={GREEN_LIGHT} strokeWidth={2} dot={false} strokeDasharray="4 2" />
+            </LineChart>
           </ResponsiveContainer>
         </ChartCard>
       </div>
 
-      {/* Charts row 2 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="% horas por categoría de formación">
+      {/* Línea 2 – Reparto estratégico */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Distribución de horas por categoría */}
+        <ChartCard title="Distribución de horas por categoría">
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="50%" height={180}>
               <PieChart>
@@ -150,7 +203,8 @@ export function TabResumen() {
           </div>
         </ChartCard>
 
-        <ChartCard title="% horas por modalidad">
+        {/* Distribución de horas por modalidad */}
+        <ChartCard title="Distribución de horas por modalidad">
           <div className="flex flex-col gap-3 pt-2">
             {modalityHours.map((m) => (
               <div key={m.modalidad} className="flex flex-col gap-1">
@@ -182,6 +236,19 @@ export function TabResumen() {
               ))}
             </div>
           </div>
+        </ChartCard>
+
+        {/* Distribución de personas formadas por nivel organizativo */}
+        <ChartCard title="Personas formadas por nivel organizativo">
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={byOrgLevel} barSize={24}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="nivel" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <Tooltip content={<Tip formatter={(v) => `${v} personas`} />} />
+              <Bar dataKey="personas" name="Personas formadas" fill={GREEN_LIGHT} radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </ChartCard>
       </div>
     </div>
