@@ -1,21 +1,21 @@
 "use client"
 
-import { Users, UserCheck, Clock, BookOpen, TrendingUp } from "lucide-react"
-import {
-  LineChart, Line,
-  BarChart, Bar,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell,
-} from "recharts"
+import { Users, TrendingUp, Clock, BarChart3, Target, Zap } from "lucide-react"
+import dynamic from "next/dynamic"
 import { KPICard } from "@/components/dashboard/kpi-card"
 import { ChartCard } from "@/components/dashboard/chart-card"
 
-const BLUE = "var(--chart-blue)"
-const GREEN = "var(--chart-green)"
-const BLUE_LIGHT = "#a8c4e8"
-const GREEN_LIGHT = "#9fd4c2"
+const HighchartsReact = dynamic(() => import("highcharts-react-official"), { ssr: false })
 
-// ─── KPI data ─────────────────────────────────────────────────────────────────
+// ─── KPI data (6 cards) ────────────────────────────────────────────────────────
 const kpis = [
+  {
+    title: "Empleados formados",
+    value: "479",
+    subtitle: "Participantes \u00fanicos finalizados",
+    icon: Users,
+    trend: { value: "8,3%", positive: true },
+  },
   {
     title: "% plantilla formada",
     value: "72,6%",
@@ -24,217 +24,402 @@ const kpis = [
     trend: { value: "4,1 pp", positive: true },
   },
   {
-    title: "Empleados formados",
-    value: "479",
-    subtitle: "Participantes \u00fanicos",
-    icon: Users,
-    trend: { value: "8,3%", positive: true },
-  },
-  {
-    title: "Participantes finalizados",
-    value: "1.366",
-    subtitle: "Completaron la acci\u00f3n",
-    icon: UserCheck,
-    trend: { value: "13,1%", positive: true },
+    title: "Horas totales impartidas",
+    value: "8.150 h",
+    subtitle: "De acciones finalizadas",
+    icon: Clock,
+    trend: { value: "11,2%", positive: true },
   },
   {
     title: "Horas totales recibidas",
     value: "7.390 h",
     subtitle: "Participantes finalizados",
-    icon: Clock,
+    icon: BarChart3,
     trend: { value: "12,4%", positive: true },
   },
   {
-    title: "Horas medias/empleado activo",
-    value: "11,2 h",
-    subtitle: "Por empleado en plantilla",
-    icon: BookOpen,
+    title: "Inversi\u00f3n en formaci\u00f3n",
+    value: "125.450 \u20ac",
+    subtitle: "Coste acciones finalizadas",
+    icon: Target,
+    trend: { value: "9,8%", positive: true },
+  },
+  {
+    title: "Satisfacci\u00f3n media",
+    value: "3,8",
+    subtitle: "De 5.0 puntos",
+    icon: Zap,
+    trend: { value: "0,2 pp", positive: true },
   },
 ]
 
-// ─── Chart data ───────────────────────────────────────────────────────────────
-const monthlyFormados = [
-  { mes: "Ene", actual: 28, anterior: 24 }, { mes: "Feb", actual: 35, anterior: 29 },
-  { mes: "Mar", actual: 42, anterior: 36 }, { mes: "Abr", actual: 31, anterior: 27 },
-  { mes: "May", actual: 48, anterior: 41 }, { mes: "Jun", actual: 55, anterior: 47 },
-  { mes: "Jul", actual: 38, anterior: 33 }, { mes: "Ago", actual: 22, anterior: 20 },
-  { mes: "Sep", actual: 46, anterior: 40 }, { mes: "Oct", actual: 52, anterior: 45 },
-  { mes: "Nov", actual: 49, anterior: 43 }, { mes: "Dic", actual: 33, anterior: 29 },
-]
+// ─── Bloque 1: Tendencia (Highcharts Line Charts) ─────────────────────────────
+const trendHorasConfig = {
+  chart: { type: "line", height: 300, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    lineColor: "var(--border)",
+    tickColor: "var(--border)",
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    gridLineColor: "var(--border)",
+  },
+  legend: { itemStyle: { fontSize: "11px", color: "var(--foreground)" } },
+  plotOptions: {
+    line: { enableMouseTracking: true, dataLabels: { enabled: false } },
+  },
+  series: [
+    {
+      name: "A\u00f1o actual",
+      data: [420, 560, 640, 480, 720, 880, 580, 320, 700, 820, 760, 510],
+      color: "var(--chart-blue)",
+      lineWidth: 2,
+    },
+    {
+      name: "A\u00f1o anterior",
+      data: [370, 490, 568, 422, 634, 772, 514, 292, 614, 726, 672, 452],
+      color: "var(--chart-green)",
+      lineWidth: 2,
+      dashStyle: "Dash",
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    shared: true,
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)", fontSize: "11px" },
+  },
+}
 
-const monthlyHoras = [
-  { mes: "Ene", actual: 420, anterior: 370 }, { mes: "Feb", actual: 560, anterior: 490 },
-  { mes: "Mar", actual: 640, anterior: 568 }, { mes: "Abr", actual: 480, anterior: 422 },
-  { mes: "May", actual: 720, anterior: 634 }, { mes: "Jun", actual: 880, anterior: 772 },
-  { mes: "Jul", actual: 580, anterior: 514 }, { mes: "Ago", actual: 320, anterior: 292 },
-  { mes: "Sep", actual: 700, anterior: 614 }, { mes: "Oct", actual: 820, anterior: 726 },
-  { mes: "Nov", actual: 760, anterior: 672 }, { mes: "Dic", actual: 510, anterior: 452 },
-]
+const trendEmpleadosConfig = {
+  chart: { type: "line", height: 300, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    lineColor: "var(--border)",
+    tickColor: "var(--border)",
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    gridLineColor: "var(--border)",
+  },
+  legend: { itemStyle: { fontSize: "11px", color: "var(--foreground)" } },
+  plotOptions: {
+    line: { enableMouseTracking: true, dataLabels: { enabled: false } },
+  },
+  series: [
+    {
+      name: "A\u00f1o actual",
+      data: [28, 35, 42, 31, 48, 55, 38, 22, 46, 52, 49, 33],
+      color: "var(--chart-blue)",
+      lineWidth: 2,
+    },
+    {
+      name: "A\u00f1o anterior",
+      data: [24, 29, 36, 27, 41, 47, 33, 20, 40, 45, 43, 29],
+      color: "var(--chart-green)",
+      lineWidth: 2,
+      dashStyle: "Dash",
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    shared: true,
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)", fontSize: "11px" },
+  },
+}
 
-const byCategory = [
-  { categoria: "Habilidades t\u00e9cnicas", acciones: 72 },
-  { categoria: "Liderazgo", acciones: 46 },
-  { categoria: "Compliance", acciones: 34 },
-  { categoria: "Soft skills", acciones: 28 },
-  { categoria: "Idiomas", acciones: 12 },
-]
+// ─── Bloque 2: Actividad Formativa (Stacked % Horizontal) ──────────────────────
+const activityByCategory = {
+  chart: { type: "bar", height: 220, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Habilidades t\u00e9cnicas", "Liderazgo", "Compliance", "Soft skills", "Idiomas"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    min: 0,
+    max: 100,
+  },
+  plotOptions: {
+    bar: {
+      stacking: "percent",
+      dataLabels: {
+        enabled: true,
+        format: "{point.percentage:.0f}%",
+        style: { fontSize: "9px", color: "white" },
+      },
+    },
+  },
+  legend: { itemStyle: { fontSize: "10px" } },
+  series: [
+    { name: "Acciones", data: [72, 46, 34, 28, 12], color: "var(--chart-blue)" },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: "<b>{point.x}</b><br/>",
+    pointFormat: "Acciones: {point.y}",
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)" },
+  },
+}
 
-const byModality = [
-  { modalidad: "Online", acciones: 111 },
-  { modalidad: "Presencial", acciones: 59 },
-  { modalidad: "Blended", acciones: 22 },
-]
+const activityByModality = {
+  chart: { type: "bar", height: 220, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Online", "Presencial", "Blended"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    min: 0,
+    max: 100,
+  },
+  plotOptions: {
+    bar: {
+      stacking: "percent",
+      dataLabels: {
+        enabled: true,
+        format: "{point.percentage:.0f}%",
+        style: { fontSize: "9px", color: "white" },
+      },
+    },
+  },
+  legend: { itemStyle: { fontSize: "10px" } },
+  series: [
+    { name: "Acciones", data: [111, 59, 22], color: "var(--chart-green)" },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: "<b>{point.x}</b><br/>",
+    pointFormat: "Acciones: {point.y}",
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)" },
+  },
+}
 
-const byGender = [
-  { genero: "Mujeres", formados: 74, noFormados: 26 },
-  { genero: "Hombres", formados: 71, noFormados: 29 },
-]
+// ─── Bloque 3: Cobertura Organizativa (Stacked % Vertical) ────────────────────
+const coverageByGender = {
+  chart: { type: "column", height: 220, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Mujeres", "Hombres"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    min: 0,
+    max: 100,
+  },
+  plotOptions: {
+    column: {
+      stacking: "percent",
+      dataLabels: {
+        enabled: true,
+        format: "{point.percentage:.0f}%",
+        style: { fontSize: "9px", color: "white" },
+      },
+    },
+  },
+  legend: { itemStyle: { fontSize: "10px" } },
+  series: [
+    { name: "Formados", data: [74, 71], color: "var(--chart-blue)" },
+    { name: "No formados", data: [26, 29], color: "#d1d5db" },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: "<b>{point.x}</b><br/>",
+    pointFormat: "{series.name}: {point.y}<br/>",
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)" },
+  },
+}
 
-const byAge = [
-  { rango: "20-29", formados: 81, noFormados: 19 },
-  { rango: "30-39", formados: 76, noFormados: 24 },
-  { rango: "40-49", formados: 69, noFormados: 31 },
-  { rango: "50-59", formados: 61, noFormados: 39 },
-  { rango: "60+", formados: 44, noFormados: 56 },
-]
+const coverageByAge = {
+  chart: { type: "column", height: 220, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["20-29", "30-39", "40-49", "50-59", "60+"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    min: 0,
+    max: 100,
+  },
+  plotOptions: {
+    column: {
+      stacking: "percent",
+      dataLabels: {
+        enabled: true,
+        format: "{point.percentage:.0f}%",
+        style: { fontSize: "9px", color: "white" },
+      },
+    },
+  },
+  legend: { itemStyle: { fontSize: "10px" } },
+  series: [
+    { name: "Formados", data: [81, 76, 69, 61, 44], color: "var(--chart-blue)" },
+    { name: "No formados", data: [19, 24, 31, 39, 56], color: "#d1d5db" },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: "<b>{point.x}</b><br/>",
+    pointFormat: "{series.name}: {point.y}<br/>",
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)" },
+  },
+}
 
-const byOrgLevel = [
-  { nivel: "Nivel bajo", formados: 66, noFormados: 34 },
-  { nivel: "Nivel medio", formados: 74, noFormados: 26 },
-  { nivel: "Nivel alto", formados: 78, noFormados: 22 },
-  { nivel: "Direcci\u00f3n", formados: 82, noFormados: 18 },
-]
+const coverageByOrgLevel = {
+  chart: { type: "column", height: 220, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Nivel bajo", "Nivel medio", "Nivel alto", "Direcci\u00f3n"],
+    labels: { style: { fontSize: "9px", color: "var(--muted-foreground)" } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    min: 0,
+    max: 100,
+  },
+  plotOptions: {
+    column: {
+      stacking: "percent",
+      dataLabels: {
+        enabled: true,
+        format: "{point.percentage:.0f}%",
+        style: { fontSize: "9px", color: "white" },
+      },
+    },
+  },
+  legend: { itemStyle: { fontSize: "10px" } },
+  series: [
+    { name: "Formados", data: [66, 74, 78, 82], color: "var(--chart-blue)" },
+    { name: "No formados", data: [34, 26, 22, 18], color: "#d1d5db" },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: "<b>{point.x}</b><br/>",
+    pointFormat: "{series.name}: {point.y}<br/>",
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)" },
+  },
+}
 
-// ─── Tooltip ──────────────────────────────────────────────────────────────────
-function Tip({ active, payload, label, suffix = "" }: {
-  active?: boolean
-  payload?: Array<{ value: number; name: string; color?: string }>
-  label?: string
-  suffix?: string
-}) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="bg-card border border-border rounded-lg shadow-md px-3 py-2 text-xs">
-      {label && <p className="font-semibold text-foreground mb-1">{label}</p>}
-      {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color || "var(--foreground)" }}>
-          {p.name}: <span className="font-semibold">{p.value}{suffix}</span>
-        </p>
-      ))}
-    </div>
-  )
+// ─── Bloque 4: Intensidad de Formaci\u00f3n (Column Chart) ─────────────────────────
+const intensityConfig = {
+  chart: { type: "column", height: 220, backgroundColor: "transparent" },
+  title: { text: null },
+  xAxis: {
+    categories: ["Mujeres", "Hombres"],
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+  },
+  yAxis: {
+    title: { text: "Horas medias por empleado" },
+    titleFormat: "",
+    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+  },
+  plotOptions: {
+    column: {
+      colorByPoint: false,
+      dataLabels: {
+        enabled: true,
+        format: "{point.y} h",
+        style: { fontSize: "10px", fontWeight: "bold" },
+      },
+    },
+  },
+  legend: { enabled: false },
+  series: [
+    {
+      name: "Horas medias",
+      data: [11.8, 10.6],
+      color: "var(--chart-green)",
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: "<b>{point.x}</b><br/>",
+    pointFormat: "Horas medias: {point.y} h",
+    backgroundColor: "var(--card)",
+    borderColor: "var(--border)",
+    style: { color: "var(--foreground)" },
+  },
 }
 
 export function TabParticipacion() {
   return (
     <div className="flex flex-col gap-4">
-      {/* KPI Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {/* KPI Cards - 6 tarjetas */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {kpis.map((kpi) => (
           <KPICard key={kpi.title} {...kpi} />
         ))}
       </div>
 
-      {/* Bloque 1 – Tendencia */}
+      {/* Bloque 1 - Tendencia (2 line charts) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ChartCard title="Tendencia mensual de horas de formaci\u00f3n recibidas">
+          <HighchartsReact highcharts={require("highcharts")} options={trendHorasConfig} />
+        </ChartCard>
+
         <ChartCard title="Tendencia mensual de empleados formados">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={monthlyFormados}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <Tooltip content={<Tip suffix=" emp." />} />
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              <Line type="monotone" dataKey="actual" name="A\u00f1o actual" stroke={BLUE} strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="anterior" name="A\u00f1o anterior" stroke={GREEN} strokeWidth={2} dot={false} strokeDasharray="4 2" />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard title="Tendencia mensual de horas recibidas">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={monthlyHoras}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <Tooltip content={<Tip suffix=" h" />} />
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              <Line type="monotone" dataKey="actual" name="A\u00f1o actual" stroke={BLUE} strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="anterior" name="A\u00f1o anterior" stroke={GREEN} strokeWidth={2} dot={false} strokeDasharray="4 2" />
-            </LineChart>
-          </ResponsiveContainer>
+          <HighchartsReact highcharts={require("highcharts")} options={trendEmpleadosConfig} />
         </ChartCard>
       </div>
 
-      {/* Bloque 2 – Distribución formativa */}
+      {/* Bloque 2 - Actividad Formativa (stacked % horizontal) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Acciones por categor\u00eda">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byCategory} layout="vertical" barSize={12}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="categoria" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={120} />
-              <Tooltip content={<Tip />} />
-              <Bar dataKey="acciones" name="Acciones" fill={GREEN} radius={[0, 3, 3, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <ChartCard title="Distribuci\u00f3n de acciones formativas por categor\u00eda">
+          <HighchartsReact highcharts={require("highcharts")} options={activityByCategory} />
         </ChartCard>
 
-        <ChartCard title="Acciones por modalidad">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byModality} barSize={36}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="modalidad" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <Tooltip content={<Tip />} />
-              <Bar dataKey="acciones" name="Acciones" fill={BLUE_LIGHT} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <ChartCard title="Distribuci\u00f3n de acciones formativas por modalidad">
+          <HighchartsReact highcharts={require("highcharts")} options={activityByModality} />
         </ChartCard>
       </div>
 
-      {/* Bloque 3 – Cobertura organizativa (stacked 100%) */}
+      {/* Bloque 3 - Cobertura Organizativa (stacked % vertical) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ChartCard title="Cobertura por g\u00e9nero">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byGender} barSize={40}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="genero" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} unit="%" domain={[0, 100]} />
-              <Tooltip content={<Tip suffix="%" />} />
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="formados" name="Formados" stackId="a" fill={GREEN} />
-              <Bar dataKey="noFormados" name="No formados" stackId="a" fill={GREEN_LIGHT} radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <ChartCard title="Cobertura de formaci\u00f3n por g\u00e9nero">
+          <HighchartsReact highcharts={require("highcharts")} options={coverageByGender} />
         </ChartCard>
 
-        <ChartCard title="Cobertura por rango de edad">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byAge} barSize={24}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="rango" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} unit="%" domain={[0, 100]} />
-              <Tooltip content={<Tip suffix="%" />} />
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="formados" name="Formados" stackId="a" fill={BLUE} />
-              <Bar dataKey="noFormados" name="No formados" stackId="a" fill={BLUE_LIGHT} radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <ChartCard title="Cobertura de formaci\u00f3n por rango de edad">
+          <HighchartsReact highcharts={require("highcharts")} options={coverageByAge} />
         </ChartCard>
 
-        <ChartCard title="Cobertura por categor\u00eda interna">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byOrgLevel} barSize={24}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="nivel" tick={{ fontSize: 9, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} unit="%" domain={[0, 100]} />
-              <Tooltip content={<Tip suffix="%" />} />
-              <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 10 }} />
-              <Bar dataKey="formados" name="Formados" stackId="a" fill={BLUE} />
-              <Bar dataKey="noFormados" name="No formados" stackId="a" fill={BLUE_LIGHT} radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <ChartCard title="Cobertura de formaci\u00f3n por categor\u00eda interna">
+          <HighchartsReact highcharts={require("highcharts")} options={coverageByOrgLevel} />
+        </ChartCard>
+      </div>
+
+      {/* Bloque 4 - Intensidad de Formaci\u00f3n */}
+      <div className="grid grid-cols-1 gap-4">
+        <ChartCard title="Horas medias de formaci\u00f3n por empleado activo por g\u00e9nero">
+          <HighchartsReact highcharts={require("highcharts")} options={intensityConfig} />
         </ChartCard>
       </div>
     </div>
