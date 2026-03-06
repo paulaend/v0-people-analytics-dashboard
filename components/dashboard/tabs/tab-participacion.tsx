@@ -15,6 +15,7 @@ const kpis = [
     subtitle: "Participantes \u00fanicos finalizados",
     icon: Users,
     trend: { value: "8,3%", positive: true },
+    tooltip: "N\u00famero de empleados \u00fanicos que han finalizado al menos una acci\u00f3n formativa en el periodo seleccionado.",
   },
   {
     title: "% plantilla formada",
@@ -22,6 +23,7 @@ const kpis = [
     subtitle: "Sobre empleados activos",
     icon: TrendingUp,
     trend: { value: "4,1 pp", positive: true },
+    tooltip: "Porcentaje de empleados activos que han finalizado formaci\u00f3n en el periodo.",
   },
   {
     title: "Horas totales impartidas",
@@ -29,6 +31,7 @@ const kpis = [
     subtitle: "De acciones finalizadas",
     icon: Clock,
     trend: { value: "11,2%", positive: true },
+    tooltip: "Suma de horas de las acciones formativas finalizadas en el periodo.",
   },
   {
     title: "Horas totales recibidas",
@@ -36,6 +39,7 @@ const kpis = [
     subtitle: "Participantes finalizados",
     icon: BarChart3,
     trend: { value: "12,4%", positive: true },
+    tooltip: "Horas de formaci\u00f3n multiplicadas por n\u00famero de participantes finalizados.",
   },
   {
     title: "Inversi\u00f3n en formaci\u00f3n",
@@ -43,6 +47,7 @@ const kpis = [
     subtitle: "Coste acciones finalizadas",
     icon: Target,
     trend: { value: "9,8%", positive: true },
+    tooltip: "Coste total de las acciones formativas finalizadas en el periodo seleccionado.",
   },
   {
     title: "Satisfacci\u00f3n media",
@@ -50,6 +55,7 @@ const kpis = [
     subtitle: "De 5.0 puntos",
     icon: Zap,
     trend: { value: "0,2 pp", positive: true },
+    tooltip: "Media de las valoraciones de los cuestionarios de satisfacci\u00f3n de las acciones formativas.",
   },
 ]
 
@@ -372,6 +378,11 @@ const intensityConfig = {
 export function TabParticipacion() {
   return (
     <div className="flex flex-col gap-4">
+      {/* Contextual message */}
+      <div className="bg-accent/20 border border-accent/30 rounded-lg px-4 py-3 text-sm text-foreground">
+        Analiza el volumen de formaci\u00f3n, su evoluci\u00f3n y el alcance en la plantilla.
+      </div>
+
       {/* KPI Cards - 6 tarjetas */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {kpis.map((kpi) => (
@@ -381,44 +392,67 @@ export function TabParticipacion() {
 
       {/* Bloque 1 - Tendencia (2 line charts) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Tendencia mensual de horas de formaci\u00f3n recibidas">
+        <ChartCard
+          title="Tendencia mensual de horas de formaci\u00f3n recibidas"
+          tooltip="Horas de formaci\u00f3n recibidas por participantes finalizados en cada mes."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={trendHorasConfig} />
         </ChartCard>
 
-        <ChartCard title="Tendencia mensual de empleados formados">
+        <ChartCard
+          title="Tendencia mensual de empleados formados"
+          tooltip="N\u00famero de empleados \u00fanicos que finalizan formaci\u00f3n cada mes."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={trendEmpleadosConfig} />
         </ChartCard>
       </div>
 
       {/* Bloque 2 - Actividad Formativa (stacked % horizontal) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Distribuci\u00f3n de acciones formativas por categor\u00eda">
+        <ChartCard
+          title="Distribuci\u00f3n de acciones formativas por categor\u00eda"
+          tooltip="Distribuci\u00f3n porcentual de las acciones formativas seg\u00fan su categor\u00eda."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={activityByCategory} />
         </ChartCard>
 
-        <ChartCard title="Distribuci\u00f3n de acciones formativas por modalidad">
+        <ChartCard
+          title="Distribuci\u00f3n de acciones formativas por modalidad"
+          tooltip="Distribuci\u00f3n de acciones formativas seg\u00fan modalidad (online, presencial, mixta)."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={activityByModality} />
         </ChartCard>
       </div>
 
       {/* Bloque 3 - Cobertura Organizativa (stacked % vertical) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ChartCard title="Cobertura de formaci\u00f3n por g\u00e9nero">
+        <ChartCard
+          title="Cobertura de formaci\u00f3n por g\u00e9nero"
+          tooltip="Proporci\u00f3n de empleados formados y no formados dentro de cada g\u00e9nero."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={coverageByGender} />
         </ChartCard>
 
-        <ChartCard title="Cobertura de formaci\u00f3n por rango de edad">
+        <ChartCard
+          title="Cobertura de formaci\u00f3n por rango de edad"
+          tooltip="Porcentaje de empleados formados en cada rango de edad."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={coverageByAge} />
         </ChartCard>
 
-        <ChartCard title="Cobertura de formaci\u00f3n por categor\u00eda interna">
+        <ChartCard
+          title="Cobertura de formaci\u00f3n por categor\u00eda interna"
+          tooltip="Proporci\u00f3n de empleados formados dentro de cada categor\u00eda organizativa."
+        >
           <HighchartsReact highcharts={require("highcharts")} options={coverageByOrgLevel} />
         </ChartCard>
       </div>
 
       {/* Bloque 4 - Intensidad de Formaci\u00f3n */}
       <div className="grid grid-cols-1 gap-4">
-        <ChartCard title="Horas medias de formaci\u00f3n por empleado activo por g\u00e9nero">
+        <ChartCard
+          title="Horas medias de formaci\u00f3n por empleado activo por g\u00e9nero"
+        >
           <HighchartsReact highcharts={require("highcharts")} options={intensityConfig} />
         </ChartCard>
       </div>

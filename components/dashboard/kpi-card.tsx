@@ -1,8 +1,8 @@
 "use client"
 
 import type { LucideIcon } from "lucide-react"
-import { Info } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { TooltipInfo } from "@/components/dashboard/tooltip-info"
 
 interface KPICardProps {
   title: string
@@ -10,10 +10,11 @@ interface KPICardProps {
   subtitle?: string
   icon: LucideIcon
   trend?: { value: string; positive: boolean }
+  tooltip?: string
   className?: string
 }
 
-export function KPICard({ title, value, subtitle, icon: Icon, trend, className }: KPICardProps) {
+export function KPICard({ title, value, subtitle, icon: Icon, trend, tooltip, className }: KPICardProps) {
   return (
     <div
       className={cn(
@@ -29,7 +30,7 @@ export function KPICard({ title, value, subtitle, icon: Icon, trend, className }
           </div>
           <span className="text-xs font-medium text-muted-foreground leading-tight line-clamp-2">{title}</span>
         </div>
-        <Info className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mt-0.5" />
+        {tooltip && <TooltipInfo text={tooltip} />}
       </div>
       <div className="flex items-end justify-between gap-1 mt-1">
         <span className="text-2xl font-bold text-foreground leading-none tracking-tight">{value}</span>
