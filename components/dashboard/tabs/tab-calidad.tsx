@@ -18,7 +18,7 @@ const GRAY = "#cbd5e1"
 // ─── KPI data (exactly 5 cards) ────────────────────────────────────────────────
 const kpis = [
   {
-    title: "Satisfacci\u00f3n media",
+    title: "Satisfacción media",
     value: "4,2 / 5",
     subtitle: "Media de cuestionarios finalizados",
     icon: Star,
@@ -27,12 +27,12 @@ const kpis = [
   {
     title: "Eficacia media (manager)",
     value: "4,0 / 5",
-    subtitle: "Evaluaci\u00f3n de transferencia",
+    subtitle: "Evaluación de transferencia",
     icon: Target,
     trend: { value: "+0,2", positive: true },
   },
   {
-    title: "Tasa de respuesta satisfacci\u00f3n",
+    title: "Tasa de respuesta satisfacción",
     value: "84,6%",
     subtitle: "Encuestas respondidas",
     icon: MessageSquare,
@@ -46,7 +46,7 @@ const kpis = [
   {
     title: "% participantes aptos",
     value: "91,3%",
-    subtitle: "Superaron evaluaci\u00f3n",
+    subtitle: "Superaron evaluación",
     icon: CheckCircle,
     trend: { value: "+3,1 pp", positive: true },
   },
@@ -86,7 +86,7 @@ const eficaciaYoY = [
 // ─── Satisfaction by offer (only satisfaction, no efficacy) ────────────────────
 const satisfaccionByCategory = [
   { categoria: "Liderazgo", valor: 4.5 },
-  { categoria: "Habilidades t\u00e9cnicas", valor: 4.3 },
+  { categoria: "Habilidades técnicas", valor: 4.3 },
   { categoria: "Soft skills", valor: 4.2 },
   { categoria: "Idiomas", valor: 4.1 },
   { categoria: "Compliance", valor: 3.8 },
@@ -118,12 +118,12 @@ const scoreDistribution = [
 // ─── Ranking de acciones ──────────────────────────────────────────────────────
 const accionesRanking = [
   { accion: "Liderazgo de excelencia", satisfaccion: 4.7, respuestas: 23 },
-  { accion: "Transformaci\u00f3n digital", satisfaccion: 4.6, respuestas: 31 },
-  { accion: "Comunicaci\u00f3n efectiva", satisfaccion: 4.5, respuestas: 28 },
-  { accion: "Gesti\u00f3n de proyectos", satisfaccion: 4.4, respuestas: 24 },
+  { accion: "Transformación digital", satisfaccion: 4.6, respuestas: 31 },
+  { accion: "Comunicación efectiva", satisfaccion: 4.5, respuestas: 28 },
+  { accion: "Gestión de proyectos", satisfaccion: 4.4, respuestas: 24 },
   { accion: "Inteligencia emocional", satisfaccion: 4.3, respuestas: 19 },
-  { accion: "Analyt\u00edtica de datos", satisfaccion: 4.2, respuestas: 15 },
-  { accion: "Seguridad cibern\u00e9tica", satisfaccion: 4.0, respuestas: 12 },
+  { accion: "Analítica de datos", satisfaccion: 4.2, respuestas: 15 },
+  { accion: "Seguridad cibernética", satisfaccion: 4.0, respuestas: 12 },
   { accion: "Compliance RGPD", satisfaccion: 3.4, respuestas: 8 },
 ]
 
@@ -163,7 +163,7 @@ export function TabCalidad() {
 
       {/* Bloque 1 – Tendencia con YoY (línea) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Tendencia mensual de satisfacci\u00f3n media">
+        <ChartCard title="Tendencia mensual de satisfacción media">
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={satisfaccionYoY}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -171,8 +171,8 @@ export function TabCalidad() {
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[3, 5]} />
               <Tooltip content={<Tip />} />
               <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-              <Line type="monotone" dataKey="actual" name="A\u00f1o actual" stroke={BLUE} strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="anterior" name="A\u00f1o anterior" stroke={GRAY} strokeWidth={2} dot={false} strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="actual" name="Año actual" stroke={BLUE} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="anterior" name="Año anterior" stroke={GRAY} strokeWidth={2} dot={false} strokeDasharray="5 5" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -185,55 +185,55 @@ export function TabCalidad() {
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[3, 5]} />
               <Tooltip content={<Tip />} />
               <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "16px" }} />
-              <Line type="monotone" dataKey="actual" name="A\u00f1o actual" stroke={GREEN} strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="anterior" name="A\u00f1o anterior" stroke={GRAY} strokeWidth={2} dot={false} strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="actual" name="Año actual" stroke={GREEN} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="anterior" name="Año anterior" stroke={GRAY} strokeWidth={2} dot={false} strokeDasharray="5 5" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
       </div>
 
-      {/* Bloque 2 – Satisfacci\u00f3n por oferta (solo satisfacci\u00f3n, sin eficacia) */}
+      {/* Bloque 2 – Satisfacción por oferta (solo satisfacción, sin eficacia) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ChartCard title="Satisfacci\u00f3n media por categor\u00eda">
+        <ChartCard title="Satisfacción media por categoría">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={satisfaccionByCategory} layout="vertical" barSize={14}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[0, 5]} />
               <YAxis dataKey="categoria" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={110} />
               <Tooltip content={<Tip />} />
-              <Bar dataKey="valor" name="Satisfacci\u00f3n" fill={BLUE} radius={[0, 3, 3, 0]} />
+              <Bar dataKey="valor" name="Satisfacción" fill={BLUE} radius={[0, 3, 3, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Satisfacci\u00f3n media por modalidad">
+        <ChartCard title="Satisfacción media por modalidad">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={satisfaccionByModality} barSize={40}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="modalidad" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[0, 5]} />
               <Tooltip content={<Tip />} />
-              <Bar dataKey="valor" name="Satisfacci\u00f3n" fill={BLUE_LIGHT} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="valor" name="Satisfacción" fill={BLUE_LIGHT} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Satisfacci\u00f3n media por proveedor">
+        <ChartCard title="Satisfacción media por proveedor">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={satisfaccionByProvider} layout="vertical" barSize={14}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[0, 5]} />
               <YAxis dataKey="proveedor" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip content={<Tip />} />
-              <Bar dataKey="valor" name="Satisfacci\u00f3n" fill={GREEN} radius={[0, 3, 3, 0]} />
+              <Bar dataKey="valor" name="Satisfacción" fill={GREEN} radius={[0, 3, 3, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
       </div>
 
-      {/* Bloque 3 – Distribuci\u00f3n de puntuaciones + Ranking */}
+      {/* Bloque 3 – Distribución de puntuaciones + Ranking */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Distribuci\u00f3n de puntuaciones de satisfacci\u00f3n (1\u20135)">
+        <ChartCard title="Distribución de puntuaciones de satisfacción (1–5)">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={scoreDistribution} barSize={36}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -249,13 +249,13 @@ export function TabCalidad() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Ranking de acciones formativas por satisfacci\u00f3n media">
+        <ChartCard title="Ranking de acciones formativas por satisfacción media">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Acci\u00f3n</th>
-                  <th className="text-center py-2 pr-3 font-semibold text-muted-foreground">Satisfacci\u00f3n</th>
+                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Acción</th>
+                  <th className="text-center py-2 pr-3 font-semibold text-muted-foreground">Satisfacción</th>
                   <th className="text-center py-2 font-semibold text-muted-foreground">Respuestas</th>
                 </tr>
               </thead>
@@ -281,13 +281,13 @@ export function TabCalidad() {
           <div className="flex items-center justify-between px-4 py-6">
             <div>
               <p className="text-sm text-muted-foreground mb-1">
-                % de acciones con satisfacci\u00f3n &lt; {UMBRAL}
+                % de acciones con satisfacción &lt; {UMBRAL}
               </p>
               <p className="text-3xl font-bold" style={{ color: BLUE }}>
                 {accionesConAlerta}%
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                Umbral de alerta configurado en {UMBRAL}. Se recomienda revisi\u00f3n de acciones bajo umbral.
+                Umbral de alerta configurado en {UMBRAL}. Se recomienda revisión de acciones bajo umbral.
               </p>
             </div>
             <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: `conic-gradient(${BLUE} 0deg ${accionesConAlerta * 3.6}deg, ${GRAY} ${accionesConAlerta * 3.6}deg)` }}>

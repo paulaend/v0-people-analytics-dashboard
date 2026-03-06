@@ -12,10 +12,10 @@ const kpis = [
   {
     title: "Empleados formados",
     value: "479",
-    subtitle: "Participantes \u00fanicos finalizados",
+    subtitle: "Participantes únicos finalizados",
     icon: Users,
     trend: { value: "8,3%", positive: true },
-    tooltip: "N\u00famero de empleados \u00fanicos que han finalizado al menos una acci\u00f3n formativa en el periodo seleccionado.",
+    tooltip: "Número de empleados únicos que han finalizado al menos una acción formativa en el periodo seleccionado.",
   },
   {
     title: "% plantilla formada",
@@ -23,7 +23,7 @@ const kpis = [
     subtitle: "Sobre empleados activos",
     icon: TrendingUp,
     trend: { value: "4,1 pp", positive: true },
-    tooltip: "Porcentaje de empleados activos que han finalizado formaci\u00f3n en el periodo.",
+    tooltip: "Porcentaje de empleados activos que han finalizado formación en el periodo.",
   },
   {
     title: "Horas totales impartidas",
@@ -39,23 +39,23 @@ const kpis = [
     subtitle: "Participantes finalizados",
     icon: BarChart3,
     trend: { value: "12,4%", positive: true },
-    tooltip: "Horas de formaci\u00f3n multiplicadas por n\u00famero de participantes finalizados.",
+    tooltip: "Horas de formación multiplicadas por número de participantes finalizados.",
   },
   {
-    title: "Inversi\u00f3n en formaci\u00f3n",
-    value: "125.450 \u20ac",
+    title: "Inversión en formación",
+    value: "125.450 €",
     subtitle: "Coste acciones finalizadas",
     icon: Target,
     trend: { value: "9,8%", positive: true },
     tooltip: "Coste total de las acciones formativas finalizadas en el periodo seleccionado.",
   },
   {
-    title: "Satisfacci\u00f3n media",
+    title: "Satisfacción media",
     value: "3,8",
     subtitle: "De 5.0 puntos",
     icon: Zap,
     trend: { value: "0,2 pp", positive: true },
-    tooltip: "Media de las valoraciones de los cuestionarios de satisfacci\u00f3n de las acciones formativas.",
+    tooltip: "Media de las valoraciones de los cuestionarios de satisfacción de las acciones formativas.",
   },
 ]
 
@@ -80,13 +80,13 @@ const trendHorasConfig = {
   },
   series: [
     {
-      name: "A\u00f1o actual",
+      name: "Año actual",
       data: [420, 560, 640, 480, 720, 880, 580, 320, 700, 820, 760, 510],
       color: "var(--chart-blue)",
       lineWidth: 2,
     },
     {
-      name: "A\u00f1o anterior",
+      name: "Año anterior",
       data: [370, 490, 568, 422, 634, 772, 514, 292, 614, 726, 672, 452],
       color: "var(--chart-green)",
       lineWidth: 2,
@@ -122,13 +122,13 @@ const trendEmpleadosConfig = {
   },
   series: [
     {
-      name: "A\u00f1o actual",
+      name: "Año actual",
       data: [28, 35, 42, 31, 48, 55, 38, 22, 46, 52, 49, 33],
       color: "var(--chart-blue)",
       lineWidth: 2,
     },
     {
-      name: "A\u00f1o anterior",
+      name: "Año anterior",
       data: [24, 29, 36, 27, 41, 47, 33, 20, 40, 45, 43, 29],
       color: "var(--chart-green)",
       lineWidth: 2,
@@ -144,78 +144,102 @@ const trendEmpleadosConfig = {
   },
 }
 
-// ─── Bloque 2: Actividad Formativa (Stacked % Horizontal) ──────────────────────
+// ─── Bloque 2: Actividad Formativa (Single horizontal 100% stacked bar) ────────
 const activityByCategory = {
-  chart: { type: "bar", height: 220, backgroundColor: "transparent" },
+  chart: { type: "bar", height: 120, backgroundColor: "transparent" },
   title: { text: null },
   xAxis: {
-    categories: ["Habilidades t\u00e9cnicas", "Liderazgo", "Compliance", "Soft skills", "Idiomas"],
+    categories: ["Total"],
     labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
   },
   yAxis: {
     title: { text: null },
-    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    labels: { enabled: false },
     min: 0,
     max: 100,
   },
   plotOptions: {
     bar: {
       stacking: "percent",
+      pointPadding: 0,
+      groupPadding: 0.15,
       dataLabels: {
         enabled: true,
-        format: "{point.percentage:.0f}%",
-        style: { fontSize: "9px", color: "white" },
+        format: "{point.y} ({point.percentage:.0f}%)",
+        style: { fontSize: "9px", color: "white", fontWeight: "bold" },
+        inside: true,
       },
     },
   },
-  legend: { itemStyle: { fontSize: "10px" } },
+  legend: { 
+    enabled: true,
+    itemStyle: { fontSize: "10px", color: "var(--foreground)" },
+    layout: "horizontal",
+    align: "center",
+    verticalAlign: "bottom",
+  },
   series: [
-    { name: "Acciones", data: [72, 46, 34, 28, 12], color: "var(--chart-blue)" },
+    { name: "Soft skills", data: [32], color: "#3b82f6" },
+    { name: "Liderazgo", data: [24], color: "#8b5cf6" },
+    { name: "Compliance", data: [18], color: "#ec4899" },
+    { name: "Idiomas", data: [14], color: "#f59e0b" },
+    { name: "Técnicas", data: [12], color: "#10b981" },
   ],
   credits: { enabled: false },
   tooltip: {
-    headerFormat: "<b>{point.x}</b><br/>",
-    pointFormat: "Acciones: {point.y}",
+    headerFormat: "",
+    pointFormat: "<b>{series.name}</b><br/>{point.y} acciones<br/>{point.percentage:.0f}%",
     backgroundColor: "var(--card)",
     borderColor: "var(--border)",
-    style: { color: "var(--foreground)" },
+    style: { color: "var(--foreground)", fontSize: "11px" },
   },
 }
 
 const activityByModality = {
-  chart: { type: "bar", height: 220, backgroundColor: "transparent" },
+  chart: { type: "bar", height: 120, backgroundColor: "transparent" },
   title: { text: null },
   xAxis: {
-    categories: ["Online", "Presencial", "Blended"],
+    categories: ["Total"],
     labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
   },
   yAxis: {
     title: { text: null },
-    labels: { style: { fontSize: "10px", color: "var(--muted-foreground)" } },
+    labels: { enabled: false },
     min: 0,
     max: 100,
   },
   plotOptions: {
     bar: {
       stacking: "percent",
+      pointPadding: 0,
+      groupPadding: 0.15,
       dataLabels: {
         enabled: true,
-        format: "{point.percentage:.0f}%",
-        style: { fontSize: "9px", color: "white" },
+        format: "{point.y} ({point.percentage:.0f}%)",
+        style: { fontSize: "9px", color: "white", fontWeight: "bold" },
+        inside: true,
       },
     },
   },
-  legend: { itemStyle: { fontSize: "10px" } },
+  legend: {
+    enabled: true,
+    itemStyle: { fontSize: "10px", color: "var(--foreground)" },
+    layout: "horizontal",
+    align: "center",
+    verticalAlign: "bottom",
+  },
   series: [
-    { name: "Acciones", data: [111, 59, 22], color: "var(--chart-green)" },
+    { name: "Online", data: [55], color: "#3b82f6" },
+    { name: "Presencial", data: [30], color: "#10b981" },
+    { name: "Blended", data: [15], color: "#f59e0b" },
   ],
   credits: { enabled: false },
   tooltip: {
-    headerFormat: "<b>{point.x}</b><br/>",
-    pointFormat: "Acciones: {point.y}",
+    headerFormat: "",
+    pointFormat: "<b>{series.name}</b><br/>{point.y} acciones<br/>{point.percentage:.0f}%",
     backgroundColor: "var(--card)",
     borderColor: "var(--border)",
-    style: { color: "var(--foreground)" },
+    style: { color: "var(--foreground)", fontSize: "11px" },
   },
 }
 
@@ -300,7 +324,7 @@ const coverageByOrgLevel = {
   chart: { type: "column", height: 220, backgroundColor: "transparent" },
   title: { text: null },
   xAxis: {
-    categories: ["Nivel bajo", "Nivel medio", "Nivel alto", "Direcci\u00f3n"],
+    categories: ["Nivel bajo", "Nivel medio", "Nivel alto", "Dirección"],
     labels: { style: { fontSize: "9px", color: "var(--muted-foreground)" } },
   },
   yAxis: {
@@ -334,7 +358,7 @@ const coverageByOrgLevel = {
   },
 }
 
-// ─── Bloque 4: Intensidad de Formaci\u00f3n (Column Chart) ─────────────────────────
+// ─── Bloque 4: Intensidad de Formación (Column Chart) ──────────────────────────
 const intensityConfig = {
   chart: { type: "column", height: 220, backgroundColor: "transparent" },
   title: { text: null },
@@ -380,7 +404,7 @@ export function TabParticipacion() {
     <div className="flex flex-col gap-4">
       {/* Contextual message */}
       <div className="bg-accent/20 border border-accent/30 rounded-lg px-4 py-3 text-sm text-foreground">
-        Analiza el volumen de formaci\u00f3n, su evoluci\u00f3n y el alcance en la plantilla.
+        Analiza el volumen de formación, su evolución y el alcance en la plantilla.
       </div>
 
       {/* KPI Cards - 6 tarjetas */}
@@ -393,32 +417,32 @@ export function TabParticipacion() {
       {/* Bloque 1 - Tendencia (2 line charts) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ChartCard
-          title="Tendencia mensual de horas de formaci\u00f3n recibidas"
-          tooltip="Horas de formaci\u00f3n recibidas por participantes finalizados en cada mes."
+          title="Tendencia mensual de horas de formación recibidas"
+          tooltip="Horas de formación recibidas por participantes finalizados en cada mes."
         >
           <HighchartsReact highcharts={require("highcharts")} options={trendHorasConfig} />
         </ChartCard>
 
         <ChartCard
           title="Tendencia mensual de empleados formados"
-          tooltip="N\u00famero de empleados \u00fanicos que finalizan formaci\u00f3n cada mes."
+          tooltip="Número de empleados únicos que finalizan formación cada mes."
         >
           <HighchartsReact highcharts={require("highcharts")} options={trendEmpleadosConfig} />
         </ChartCard>
       </div>
 
-      {/* Bloque 2 - Actividad Formativa (stacked % horizontal) */}
+      {/* Bloque 2 - Actividad Formativa (single 100% stacked horizontal bar) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ChartCard
-          title="Distribuci\u00f3n de acciones formativas por categor\u00eda"
-          tooltip="Distribuci\u00f3n porcentual de las acciones formativas seg\u00fan su categor\u00eda."
+          title="Distribución de acciones formativas por categoría"
+          tooltip="Distribución porcentual de las acciones formativas según su categoría."
         >
           <HighchartsReact highcharts={require("highcharts")} options={activityByCategory} />
         </ChartCard>
 
         <ChartCard
-          title="Distribuci\u00f3n de acciones formativas por modalidad"
-          tooltip="Distribuci\u00f3n de acciones formativas seg\u00fan modalidad (online, presencial, mixta)."
+          title="Distribución de acciones formativas por modalidad"
+          tooltip="Distribución de acciones formativas según modalidad (online, presencial, mixta)."
         >
           <HighchartsReact highcharts={require("highcharts")} options={activityByModality} />
         </ChartCard>
@@ -427,31 +451,31 @@ export function TabParticipacion() {
       {/* Bloque 3 - Cobertura Organizativa (stacked % vertical) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ChartCard
-          title="Cobertura de formaci\u00f3n por g\u00e9nero"
-          tooltip="Proporci\u00f3n de empleados formados y no formados dentro de cada g\u00e9nero."
+          title="Cobertura de formación por género"
+          tooltip="Proporción de empleados formados y no formados dentro de cada género."
         >
           <HighchartsReact highcharts={require("highcharts")} options={coverageByGender} />
         </ChartCard>
 
         <ChartCard
-          title="Cobertura de formaci\u00f3n por rango de edad"
+          title="Cobertura de formación por rango de edad"
           tooltip="Porcentaje de empleados formados en cada rango de edad."
         >
           <HighchartsReact highcharts={require("highcharts")} options={coverageByAge} />
         </ChartCard>
 
         <ChartCard
-          title="Cobertura de formaci\u00f3n por categor\u00eda interna"
-          tooltip="Proporci\u00f3n de empleados formados dentro de cada categor\u00eda organizativa."
+          title="Cobertura de formación por categoría interna"
+          tooltip="Proporción de empleados formados dentro de cada categoría organizativa."
         >
           <HighchartsReact highcharts={require("highcharts")} options={coverageByOrgLevel} />
         </ChartCard>
       </div>
 
-      {/* Bloque 4 - Intensidad de Formaci\u00f3n */}
+      {/* Bloque 4 - Intensidad de Formación */}
       <div className="grid grid-cols-1 gap-4">
         <ChartCard
-          title="Horas medias de formaci\u00f3n por empleado activo por g\u00e9nero"
+          title="Horas medias de formación por empleado activo por género"
         >
           <HighchartsReact highcharts={require("highcharts")} options={intensityConfig} />
         </ChartCard>
