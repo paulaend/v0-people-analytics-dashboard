@@ -1,263 +1,433 @@
-"use client"
+'use client'
 
-import { Star, Target, MessageSquare, BarChart2, CheckCircle, AlertTriangle } from "lucide-react"
-import {
-  BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
-} from "recharts"
-import { KPICard } from "@/components/dashboard/kpi-card"
-import { ChartCard } from "@/components/dashboard/chart-card"
+import { Star, Target, MessageSquare, BarChart2, CheckCircle } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { KPICard } from '@/components/dashboard/kpi-card'
+import { ChartCard } from '@/components/dashboard/chart-card'
+import { WidgetGrid } from '@/components/dashboard/widget-grid'
 
-const BLUE = "var(--chart-blue)"
-const GREEN = "var(--chart-green)"
-const BLUE_LIGHT = "#a8c4e8"
-const GREEN_LIGHT = "#9fd4c2"
+const HighchartsReact = dynamic(() => import('highcharts-react-official'), { ssr: false })
 
-// ─── KPI data ─────────────────────────────────────────────────────────────────
+// ─── KPI data (5 cards with tooltips) ──────────────────────────────────────────
 const kpis = [
   {
-    title: "Valoraci\u00f3n media global",
-    value: "4,2 / 5",
-    subtitle: "Media global de cuestionarios",
+    title: 'Satisfacción media',
+    value: '4,2 / 5',
+    subtitle: 'Media de cuestionarios finalizados',
     icon: Star,
-    trend: { value: "+0,3", positive: true },
+    trend: { value: '+0,3', positive: true },
+    tooltip: 'Media de las respuestas de los cuestionarios de satisfacción completados por participantes al finalizar la formación.',
   },
   {
-    title: "Eficacia media (manager)",
-    value: "4,0 / 5",
-    subtitle: "Evaluaci\u00f3n de transferencia",
+    title: 'Eficacia media (manager)',
+    value: '4,0 / 5',
+    subtitle: 'Evaluación de transferencia',
     icon: Target,
-    trend: { value: "+0,2", positive: true },
+    trend: { value: '+0,2', positive: true },
+    tooltip: 'Valoración realizada por el responsable del participante sobre la aplicación de la formación en el puesto de trabajo.',
   },
   {
-    title: "Tasa respuesta valoraci\u00f3n",
-    value: "84,6%",
-    subtitle: "Encuestas respondidas",
+    title: 'Tasa de respuesta satisfacción',
+    value: '84,6%',
+    subtitle: 'Encuestas respondidas',
     icon: MessageSquare,
+    tooltip: 'Porcentaje de cuestionarios de satisfacción respondidos respecto al total enviado.',
   },
   {
-    title: "Tasa respuesta eficacia",
-    value: "76,2%",
-    subtitle: "Encuestas respondidas",
+    title: 'Tasa de respuesta eficacia',
+    value: '76,2%',
+    subtitle: 'Encuestas respondidas',
     icon: BarChart2,
+    tooltip: 'Porcentaje de cuestionarios de eficacia respondidos respecto al total enviado.',
   },
   {
-    title: "% participantes aptos",
-    value: "91,3%",
-    subtitle: "Superaron evaluaci\u00f3n",
+    title: '% participantes aptos',
+    value: '91,3%',
+    subtitle: 'Superaron evaluación',
     icon: CheckCircle,
-    trend: { value: "+3,1 pp", positive: true },
-  },
-  {
-    title: "% acciones bajo umbral",
-    value: "6,8%",
-    subtitle: "Satisfacci\u00f3n media < 3,5",
-    icon: AlertTriangle,
-    trend: { value: "-1,2 pp", positive: true },
+    trend: { value: '+3,1 pp', positive: true },
+    tooltip: 'Participantes que cumplen los criterios de aptitud dividido entre participantes evaluados.',
   },
 ]
 
-// ─── Chart data ───────────────────────────────────────────────────────────────
-const monthlyValoracion = [
-  { mes: "Ene", valoracion: 4.0 }, { mes: "Feb", valoracion: 4.1 },
-  { mes: "Mar", valoracion: 4.2 }, { mes: "Abr", valoracion: 4.0 },
-  { mes: "May", valoracion: 4.3 }, { mes: "Jun", valoracion: 4.4 },
-  { mes: "Jul", valoracion: 4.2 }, { mes: "Ago", valoracion: 3.9 },
-  { mes: "Sep", valoracion: 4.3 }, { mes: "Oct", valoracion: 4.4 },
-  { mes: "Nov", valoracion: 4.2 }, { mes: "Dic", valoracion: 4.1 },
-]
+// ─── Highcharts configurations ─────────────────────────────────────────────────
 
-const monthlyEficacia = [
-  { mes: "Ene", eficacia: 3.8 }, { mes: "Feb", eficacia: 3.9 },
-  { mes: "Mar", eficacia: 4.0 }, { mes: "Abr", eficacia: 3.7 },
-  { mes: "May", eficacia: 4.1 }, { mes: "Jun", eficacia: 4.2 },
-  { mes: "Jul", eficacia: 4.0 }, { mes: "Ago", eficacia: 3.6 },
-  { mes: "Sep", eficacia: 4.1 }, { mes: "Oct", eficacia: 4.3 },
-  { mes: "Nov", eficacia: 4.1 }, { mes: "Dic", eficacia: 3.9 },
-]
-
-const byCategory = [
-  { categoria: "Liderazgo", valoracion: 4.5, eficacia: 4.4 },
-  { categoria: "Habilidades t\u00e9cnicas", valoracion: 4.3, eficacia: 4.1 },
-  { categoria: "Soft skills", valoracion: 4.2, eficacia: 4.0 },
-  { categoria: "Idiomas", valoracion: 4.1, eficacia: 3.9 },
-  { categoria: "Compliance", valoracion: 3.8, eficacia: 3.6 },
-]
-
-const byModality = [
-  { modalidad: "Presencial", valoracion: 4.5 },
-  { modalidad: "Blended", valoracion: 4.3 },
-  { modalidad: "Online", valoracion: 4.1 },
-]
-
-const byProvider = [
-  { proveedor: "EAE Business", valoracion: 4.6 },
-  { proveedor: "Udemy Business", valoracion: 4.4 },
-  { proveedor: "F. Interna", valoracion: 4.3 },
-  { proveedor: "LinkedIn Learn.", valoracion: 4.2 },
-  { proveedor: "Coursera Teams", valoracion: 4.1 },
-]
-
-const scoreDistribution = [
-  { puntuacion: "1", porcentaje: 2, color: "#f87171" },
-  { puntuacion: "2", porcentaje: 5, color: "#fca5a5" },
-  { puntuacion: "3", porcentaje: 14, color: "#e2e8f0" },
-  { puntuacion: "4", porcentaje: 38, color: BLUE_LIGHT },
-  { puntuacion: "5", porcentaje: 41, color: GREEN },
-]
-
-const UMBRAL = 3.5
-
-const accionesBajoUmbral = [
-  { accion: "Prevenci\u00f3n de riesgos laborales", categoria: "Compliance", valoracion: 3.2 },
-  { accion: "Compliance RGPD", categoria: "Compliance", valoracion: 3.4 },
-  { accion: "Normativa interna 2025", categoria: "Compliance", valoracion: 3.4 },
-  { accion: "Excel b\u00e1sico", categoria: "Habilidades t\u00e9cnicas", valoracion: 3.45 },
-  { accion: "Ingl\u00e9s nivel A2", categoria: "Idiomas", valoracion: 3.48 },
-]
-
-// ─── Tooltip ──────────────────────────────────────────────────────────────────
-function Tip({ active, payload, label, suffix = "" }: {
-  active?: boolean
-  payload?: Array<{ value: number; name: string; color?: string }>
-  label?: string
-  suffix?: string
-}) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="bg-card border border-border rounded-lg shadow-md px-3 py-2 text-xs">
-      {label && <p className="font-semibold text-foreground mb-1">{label}</p>}
-      {payload.map((p, i) => (
-        <p key={i} style={{ color: p.color || "var(--foreground)" }}>
-          {p.name}: <span className="font-semibold">{p.value}{suffix}</span>
-        </p>
-      ))}
-    </div>
-  )
+const satisfaccionYoYConfig = {
+  chart: { type: 'line', height: 300, backgroundColor: 'transparent' },
+  title: { text: null },
+  xAxis: {
+    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    lineColor: 'var(--border)',
+    tickColor: 'var(--border)',
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    gridLineColor: 'var(--border)',
+    min: 0,
+    max: 5,
+  },
+  legend: { itemStyle: { fontSize: '11px', color: 'var(--foreground)' } },
+  plotOptions: {
+    line: { enableMouseTracking: true, dataLabels: { enabled: false } },
+  },
+  series: [
+    {
+      name: 'Año actual',
+      data: [4.0, 4.1, 4.2, 4.0, 4.3, 4.4, 4.2, 3.9, 4.3, 4.4, 4.2, 4.1],
+      color: 'var(--chart-blue)',
+      lineWidth: 2,
+    },
+    {
+      name: 'Año anterior',
+      data: [3.8, 3.9, 4.0, 3.7, 4.1, 4.2, 4.0, 3.8, 4.1, 4.2, 4.0, 3.9],
+      color: 'var(--chart-green)',
+      lineWidth: 2,
+      dashStyle: 'Dash',
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    shared: true,
+    backgroundColor: 'var(--card)',
+    borderColor: 'var(--border)',
+    style: { color: 'var(--foreground)', fontSize: '11px' },
+  },
 }
+
+const eficaciaYoYConfig = {
+  chart: { type: 'line', height: 300, backgroundColor: 'transparent' },
+  title: { text: null },
+  xAxis: {
+    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    lineColor: 'var(--border)',
+    tickColor: 'var(--border)',
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    gridLineColor: 'var(--border)',
+    min: 0,
+    max: 5,
+  },
+  legend: { itemStyle: { fontSize: '11px', color: 'var(--foreground)' } },
+  plotOptions: {
+    line: { enableMouseTracking: true, dataLabels: { enabled: false } },
+  },
+  series: [
+    {
+      name: 'Año actual',
+      data: [3.8, 3.9, 4.0, 3.7, 4.1, 4.2, 4.0, 3.6, 4.1, 4.3, 4.1, 3.9],
+      color: 'var(--chart-blue)',
+      lineWidth: 2,
+    },
+    {
+      name: 'Año anterior',
+      data: [3.6, 3.7, 3.8, 3.5, 3.9, 4.0, 3.8, 3.5, 3.9, 4.1, 3.9, 3.7],
+      color: 'var(--chart-green)',
+      lineWidth: 2,
+      dashStyle: 'Dash',
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    shared: true,
+    backgroundColor: 'var(--card)',
+    borderColor: 'var(--border)',
+    style: { color: 'var(--foreground)', fontSize: '11px' },
+  },
+}
+
+const satisfaccionByCategoryConfig = {
+  chart: { type: 'bar', height: 220, backgroundColor: 'transparent' },
+  title: { text: null },
+  xAxis: {
+    categories: ['Soft skills', 'Liderazgo', 'Compliance', 'Idiomas', 'Técnicas'],
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    min: 0,
+    max: 5,
+  },
+  plotOptions: {
+    bar: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.y}',
+        style: { fontSize: '10px', fontWeight: 'bold' },
+      },
+    },
+  },
+  legend: { enabled: false },
+  series: [
+    {
+      name: 'Satisfacción media',
+      data: [4.3, 4.1, 4.0, 4.2, 3.9],
+      color: 'var(--chart-blue)',
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: '<b>{point.x}</b><br/>',
+    pointFormat: 'Satisfacción: {point.y} / 5',
+    backgroundColor: 'var(--card)',
+    borderColor: 'var(--border)',
+    style: { color: 'var(--foreground)', fontSize: '11px' },
+  },
+}
+
+const satisfaccionByModalityConfig = {
+  chart: { type: 'bar', height: 220, backgroundColor: 'transparent' },
+  title: { text: null },
+  xAxis: {
+    categories: ['Online', 'Presencial', 'Blended'],
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    min: 0,
+    max: 5,
+  },
+  plotOptions: {
+    bar: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.y}',
+        style: { fontSize: '10px', fontWeight: 'bold' },
+      },
+    },
+  },
+  legend: { enabled: false },
+  series: [
+    {
+      name: 'Satisfacción media',
+      data: [4.0, 4.4, 4.1],
+      color: 'var(--chart-green)',
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: '<b>{point.x}</b><br/>',
+    pointFormat: 'Satisfacción: {point.y} / 5',
+    backgroundColor: 'var(--card)',
+    borderColor: 'var(--border)',
+    style: { color: 'var(--foreground)', fontSize: '11px' },
+  },
+}
+
+const satisfaccionByProviderConfig = {
+  chart: { type: 'bar', height: 220, backgroundColor: 'transparent' },
+  title: { text: null },
+  xAxis: {
+    categories: ['Proveedor A', 'Proveedor B', 'Proveedor C', 'Interno'],
+    labels: { style: { fontSize: '9px', color: 'var(--muted-foreground)' } },
+  },
+  yAxis: {
+    title: { text: null },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    min: 0,
+    max: 5,
+  },
+  plotOptions: {
+    bar: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.y}',
+        style: { fontSize: '10px', fontWeight: 'bold' },
+      },
+    },
+  },
+  legend: { enabled: false },
+  series: [
+    {
+      name: 'Satisfacción media',
+      data: [4.2, 3.9, 4.3, 4.1],
+      color: '#f59e0b',
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: '<b>{point.x}</b><br/>',
+    pointFormat: 'Satisfacción: {point.y} / 5',
+    backgroundColor: 'var(--card)',
+    borderColor: 'var(--border)',
+    style: { color: 'var(--foreground)', fontSize: '11px' },
+  },
+}
+
+const scoreDistributionConfig = {
+  chart: { type: 'column', height: 220, backgroundColor: 'transparent' },
+  title: { text: null },
+  xAxis: {
+    categories: ['1', '2', '3', '4', '5'],
+    title: { text: 'Puntuación' },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+  },
+  yAxis: {
+    title: { text: 'Número de respuestas' },
+    labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+  },
+  plotOptions: {
+    column: {
+      colorByPoint: true,
+      dataLabels: {
+        enabled: true,
+        format: '{point.y}',
+        style: { fontSize: '10px', fontWeight: 'bold' },
+      },
+    },
+  },
+  legend: { enabled: false },
+  series: [
+    {
+      name: 'Respuestas',
+      data: [
+        { y: 45, color: '#ef4444' },
+        { y: 82, color: '#f97316' },
+        { y: 156, color: '#eab308' },
+        { y: 298, color: '#84cc16' },
+        { y: 419, color: '#22c55e' },
+      ],
+    },
+  ],
+  credits: { enabled: false },
+  tooltip: {
+    headerFormat: '<b>Puntuación: {point.x}</b><br/>',
+    pointFormat: 'Respuestas: {point.y}',
+    backgroundColor: 'var(--card)',
+    borderColor: 'var(--border)',
+    style: { color: 'var(--foreground)', fontSize: '11px' },
+  },
+}
+
+const outlierTableData = [
+  { nombre: 'Excel Avanzado', satisfaccion: 4.8, respuestas: 28, outlier: 'superior' },
+  { nombre: 'Presentaciones Efectivas', satisfaccion: 4.7, respuestas: 35, outlier: 'superior' },
+  { nombre: 'Comunicación Asertiva', satisfaccion: 4.6, respuestas: 42, outlier: 'superior' },
+  { nombre: 'Gestión del Estrés', satisfaccion: 2.1, respuestas: 24, outlier: 'inferior' },
+  { nombre: 'Cumplimiento RGPD', satisfaccion: 2.5, respuestas: 31, outlier: 'inferior' },
+]
 
 export function TabCalidad() {
   return (
     <div className="flex flex-col gap-4">
-      {/* KPI Row – 6 tarjetas */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* Contextual message */}
+      <div className="bg-accent/20 border border-accent/30 rounded-lg px-4 py-3 text-sm text-foreground">
+        Analiza la calidad de la formación a través de las evaluaciones de satisfacción y eficacia.
+      </div>
+
+      {/* KPI Cards - 5 tarjetas */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {kpis.map((kpi) => (
           <KPICard key={kpi.title} {...kpi} />
         ))}
       </div>
 
-      {/* Bloque 1 – Tendencia */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Tendencia mensual de valoraci\u00f3n media">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={monthlyValoracion}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[3, 5]} />
-              <Tooltip content={<Tip />} />
-              <Line type="monotone" dataKey="valoracion" name="Valoraci\u00f3n" stroke={BLUE} strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
+      {/* Widgets Grid - Default widgets */}
+      <WidgetGrid>
+        {/* Tendencia mensual de satisfacción media */}
+        <div className="col-span-1 md:col-span-2">
+          <ChartCard
+            title="Tendencia mensual de satisfacción media"
+            tooltip="Evolución de la satisfacción media mes a mes comparado con el año anterior."
+          >
+            <HighchartsReact highcharts={require('highcharts')} options={satisfaccionYoYConfig} />
+          </ChartCard>
+        </div>
 
-        <ChartCard title="Tendencia mensual de eficacia media">
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={monthlyEficacia}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="mes" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[3, 5]} />
-              <Tooltip content={<Tip />} />
-              <Line type="monotone" dataKey="eficacia" name="Eficacia" stroke={GREEN} strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
+        {/* Tendencia mensual de eficacia media */}
+        <div className="col-span-1 md:col-span-2">
+          <ChartCard
+            title="Tendencia mensual de eficacia media"
+            tooltip="Evolución de la eficacia media mes a mes comparado con el año anterior."
+          >
+            <HighchartsReact highcharts={require('highcharts')} options={eficaciaYoYConfig} />
+          </ChartCard>
+        </div>
 
-      {/* Bloque 2 – Calidad por oferta */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ChartCard title="Valoraci\u00f3n media por categor\u00eda">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byCategory} layout="vertical" barSize={12}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[0, 5]} />
-              <YAxis dataKey="categoria" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={110} />
-              <Tooltip content={<Tip />} />
-              <Bar dataKey="valoracion" name="Valoraci\u00f3n" fill={BLUE} radius={[0, 3, 3, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
+        {/* Satisfacción media por categoría */}
+        <div className="col-span-1">
+          <ChartCard
+            title="Satisfacción media por categoría"
+            tooltip="Puntuación promedio de satisfacción para cada categoría de formación."
+          >
+            <HighchartsReact highcharts={require('highcharts')} options={satisfaccionByCategoryConfig} />
+          </ChartCard>
+        </div>
 
-        <ChartCard title="Valoraci\u00f3n media por modalidad">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byModality} barSize={36}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="modalidad" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[0, 5]} />
-              <Tooltip content={<Tip />} />
-              <Bar dataKey="valoracion" name="Valoraci\u00f3n" fill={BLUE_LIGHT} radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
+        {/* Satisfacción media por modalidad */}
+        <div className="col-span-1">
+          <ChartCard
+            title="Satisfacción media por modalidad"
+            tooltip="Satisfacción promedio según el tipo de modalidad (online, presencial, blended)."
+          >
+            <HighchartsReact highcharts={require('highcharts')} options={satisfaccionByModalityConfig} />
+          </ChartCard>
+        </div>
 
-        <ChartCard title="Valoraci\u00f3n media por proveedor">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byProvider} layout="vertical" barSize={12}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} domain={[0, 5]} />
-              <YAxis dataKey="proveedor" type="category" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={100} />
-              <Tooltip content={<Tip />} />
-              <Bar dataKey="valoracion" name="Valoraci\u00f3n" fill={GREEN} radius={[0, 3, 3, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
+        {/* Satisfacción media por proveedor */}
+        <div className="col-span-1">
+          <ChartCard
+            title="Satisfacción media por proveedor"
+            tooltip="Puntuación de satisfacción promedio para cada proveedor de formación."
+          >
+            <HighchartsReact highcharts={require('highcharts')} options={satisfaccionByProviderConfig} />
+          </ChartCard>
+        </div>
 
-      {/* Bloque 3 – Distribución + tabla umbral */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ChartCard title="Distribuci\u00f3n de puntuaciones de satisfacci\u00f3n (1\u20135)">
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={scoreDistribution} barSize={32}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="puntuacion" tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} unit="%" />
-              <Tooltip content={<Tip suffix="%" />} />
-              <Bar dataKey="porcentaje" name="% respuestas" radius={[3, 3, 0, 0]}>
-                {scoreDistribution.map((entry, index) => (
-                  <Cell key={index} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
+        {/* Distribución de puntuaciones de satisfacción */}
+        <div className="col-span-1 md:col-span-2">
+          <ChartCard
+            title="Distribución de puntuaciones de satisfacción"
+            tooltip="Cantidad de respuestas por cada nivel en la escala 1-5."
+          >
+            <HighchartsReact highcharts={require('highcharts')} options={scoreDistributionConfig} />
+          </ChartCard>
+        </div>
 
-        <ChartCard title="Acciones bajo umbral (valoraci\u00f3n < 3,5)">
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Acci\u00f3n</th>
-                  <th className="text-left py-2 pr-3 font-semibold text-muted-foreground">Categor\u00eda</th>
-                  <th className="text-right py-2 font-semibold text-muted-foreground">Valoraci\u00f3n</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accionesBajoUmbral.map((a, i) => (
-                  <tr key={i} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-3 text-foreground">{a.accion}</td>
-                    <td className="py-2 pr-3 text-muted-foreground">{a.categoria}</td>
-                    <td className="py-2 text-right font-semibold" style={{ color: "#ef4444" }}>
-                      {a.valoracion.toFixed(2)}
-                    </td>
+        {/* Outliers de satisfacción - Table */}
+        <div className="col-span-1 md:col-span-2">
+          <ChartCard
+            title="Outliers de satisfacción"
+            tooltip="Acciones formativas cuya valoración media se encuentra significativamente por encima o por debajo de la media general del periodo."
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 font-semibold text-foreground">Acción</th>
+                    <th className="text-center py-2 px-3 font-semibold text-foreground">Satisfacción</th>
+                    <th className="text-center py-2 px-3 font-semibold text-foreground">Respuestas</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="text-[10px] text-muted-foreground mt-2">
-              Umbral de alerta: valoraci\u00f3n inferior a {UMBRAL}. Ordenadas de peor a mejor.
-            </p>
-          </div>
-        </ChartCard>
-      </div>
+                </thead>
+                <tbody>
+                  {outlierTableData.map((row, idx) => (
+                    <tr
+                      key={idx}
+                      className={`border-b border-border/50 ${
+                        row.outlier === 'superior' ? 'bg-green-50/30' : 'bg-red-50/30'
+                      } hover:bg-muted/50`}
+                    >
+                      <td className="py-2 px-3 text-foreground">{row.nombre}</td>
+                      <td className={`text-center py-2 px-3 font-semibold ${
+                        row.outlier === 'superior' ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {row.satisfaccion} / 5
+                      </td>
+                      <td className="text-center py-2 px-3 text-muted-foreground">{row.respuestas}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </ChartCard>
+        </div>
+      </WidgetGrid>
     </div>
   )
 }

@@ -3,15 +3,17 @@
 import type { ReactNode } from "react"
 import { Maximize2, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { TooltipInfo } from "@/components/dashboard/tooltip-info"
 
 interface ChartCardProps {
   title: string
   children: ReactNode
   className?: string
   expandable?: boolean
+  tooltip?: string
 }
 
-export function ChartCard({ title, children, className, expandable = true }: ChartCardProps) {
+export function ChartCard({ title, children, className, expandable = true, tooltip }: ChartCardProps) {
   return (
     <div
       className={cn(
@@ -20,7 +22,10 @@ export function ChartCard({ title, children, className, expandable = true }: Cha
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-foreground leading-tight">{title}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-foreground leading-tight">{title}</h3>
+          {tooltip && <TooltipInfo text={tooltip} />}
+        </div>
         <div className="flex items-center gap-1">
           {expandable && (
             <button

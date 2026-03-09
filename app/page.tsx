@@ -9,8 +9,8 @@ import { TabCalidad } from "@/components/dashboard/tabs/tab-calidad"
 import { cn } from "@/lib/utils"
 
 const TABS = [
-  { id: "participacion", label: "Participaci\u00f3n" },
-  { id: "calidad", label: "Calidad y Resultado" },
+  { id: "participacion", label: "Participación" },
+  { id: "calidad", label: "Satisfacción y eficacia" },
 ] as const
 
 type TabId = (typeof TABS)[number]["id"]
