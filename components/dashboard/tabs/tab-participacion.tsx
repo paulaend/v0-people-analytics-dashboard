@@ -358,44 +358,60 @@ const coverageByOrgLevelConfig = {
   },
 }
 
-const intensityConfig = {
-  chart: { type: 'column', height: 220, backgroundColor: 'transparent' },
+const makeIntensityBarConfig = (categories: string[], data: number[]) => ({
+  chart: { type: 'bar', height: 40 + categories.length * 36, backgroundColor: 'transparent' },
   title: { text: null },
   xAxis: {
-    categories: ['Mujeres', 'Hombres'],
+    categories,
     labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    lineColor: 'var(--border)',
   },
   yAxis: {
-    title: { text: 'Horas medias por empleado' },
+    title: { text: null },
     labels: { style: { fontSize: '10px', color: 'var(--muted-foreground)' } },
+    gridLineColor: 'var(--border)',
   },
   plotOptions: {
-    column: {
+    bar: {
       colorByPoint: false,
       dataLabels: {
         enabled: true,
         format: '{point.y} h',
-        style: { fontSize: '10px', fontWeight: 'bold' },
+        style: { fontSize: '10px', fontWeight: 'bold', color: 'var(--foreground)' },
       },
     },
   },
   legend: { enabled: false },
-  series: [
-    {
-      name: 'Horas medias',
-      data: [11.8, 10.6],
-      color: 'var(--chart-green)',
-    },
-  ],
+  series: [{ name: 'Horas por empleado', data, color: 'var(--chart-green)' }],
   credits: { enabled: false },
   tooltip: {
     headerFormat: '<b>{point.x}</b><br/>',
-    pointFormat: 'Horas medias: {point.y} h',
+    pointFormat: 'Horas por empleado: {point.y} h',
     backgroundColor: 'var(--card)',
     borderColor: 'var(--border)',
-    style: { color: 'var(--foreground)' },
+    style: { color: 'var(--foreground)', fontSize: '11px' },
   },
-}
+})
+
+const intensityByDireccionConfig = makeIntensityBarConfig(
+  ['Dirección Comercial', 'Operaciones', 'Tecnología', 'RRHH', 'Finanzas'],
+  [15.4, 12.8, 18.2, 10.5, 9.7]
+)
+
+const intensityByAreaConfig = makeIntensityBarConfig(
+  ['Ventas', 'Desarrollo', 'Soporte', 'Marketing', 'Compras', 'Legal'],
+  [14.2, 17.6, 11.3, 13.0, 9.8, 8.4]
+)
+
+const intensityByDepartamentoConfig = makeIntensityBarConfig(
+  ['Cuentas clave', 'Backend', 'Helpdesk', 'Branding', 'Aprovision.', 'Compliance', 'Formación'],
+  [16.0, 18.9, 10.7, 13.5, 9.2, 12.1, 22.4]
+)
+
+const intensityByUnidadConfig = makeIntensityBarConfig(
+  ['Unidad Norte', 'Unidad Sur', 'Unidad Este', 'Unidad Oeste', 'Unidad Central'],
+  [13.1, 11.6, 14.8, 12.3, 16.5]
+)
 
 export function TabParticipacion() {
   return (
